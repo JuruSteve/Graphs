@@ -30,20 +30,20 @@ def earliest_ancestor(ancestors, starting_node):
     for ancestor in ancestors:
         g.add_vertex(ancestor[0])
         g.add_vertex(ancestor[1])
-        g.add_edges(ancestor[0], ancestor[1])
-
-
+        g.add_edges(ancestor[1], ancestor[0])
 
     qq = Queue()
-    visited = set()
     qq.enqueue([starting_node])
-
+    earliest = -1
+    longest_path = 1
     while qq.size() > 0:
         path = qq.dequeue()
         v = path[-1]
-        if v not in visited:
-            visited.add(v)
-            for neighbor in g.vertices[v]:
-                new_path = list(path)
-                new_path.append(neighbor)
-                qq.enqueue(new_path)
+        if (len(path) > longest_path) or (len(path) >= longest_path and v < earliest):
+            earliest = v 
+            longest_path = len(path)
+        for neighbor in g.vertices[v]:
+            new_path = list(path)
+            new_path.append(neighbor)
+            qq.enqueue(new_path)
+    return earliest
