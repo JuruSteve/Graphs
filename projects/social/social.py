@@ -1,3 +1,18 @@
+# Learn more or give us feedback
+import random
+
+class Queue():
+    def __init__(self):
+        self.queue = []
+    def enqueue(self, value):
+        self.queue.append(value)
+    def dequeue(self):
+        if self.size() > 0:
+            return self.queue.pop(0)
+        else:
+            return None
+    def size(self):
+        return len(self.queue)
 
 
 class User:
@@ -34,10 +49,8 @@ class SocialGraph:
         """
         Takes a number of users and an average number of friendships
         as arguments
-
         Creates that number of users and a randomly distributed friendships
         between those users.
-
         The number of users must be greater than the average number of friendships.
         """
         # Reset graph
@@ -47,26 +60,54 @@ class SocialGraph:
         # !!!! IMPLEMENT ME
 
         # Add users
-
+        for i in range(0, numUsers):
+            self.addUser(f"User {i+1}")
         # Create friendships
+        possibleFriendships = []
+        for user in self.users:
+            for friend in range(user + 1, numUsers + 1):
+                possibleFriendships.append((user,friend))
+
+        random.shuffle(possibleFriendships)
+        addFriendsCount = 0
+        for i in range(numUsers * avgFriendships // 2):
+            friendship = possibleFriendships[i]
+            self.addFriendship(friendship[0], friendship[1])
+            addFriendsCount +=1
+        print ('addFriendsCount', addFriendsCount)
 
     def getAllSocialPaths(self, userID):
         """
         Takes a user's userID as an argument
-
         Returns a dictionary containing every user in that user's
         extended network with the shortest friendship path between them.
-
         The key is the friend's ID and the value is the path.
         """
         visited = {}  # Note that this is a dictionary, not a set
-        # !!!! IMPLEMENT ME
+        qu = Queue()
+        qu.enqueue([userID])
+
+        while qu.size() > 0:
+            path = qu.dequeue()
+            v = path[-1]
+            if v not in visited:
+                visited[v] = path
+
+                for neighbor in self.friendships[v]:
+                    path_copy = path.copy()
+                    path_copy.append(neighbor)
+                    qu.enqueue(path_copy)
         return visited
 
 
 if __name__ == '__main__':
     sg = SocialGraph()
-    sg.populateGraph(10, 2)
+    sg.populateGraph(1000, 5)
     print(sg.friendships)
     connections = sg.getAllSocialPaths(1)
     print(connections)
+
+    total_social_paths = 0
+    for user in connections:
+        total_social_paths += len(connections[user])
+    print(f"Avg length of social path: {total_social_paths/len(connections)}")
