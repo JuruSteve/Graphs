@@ -17,13 +17,49 @@ roomGraph={494: [(1, 8), {'e': 457}], 492: [(1, 20), {'e': 400}], 493: [(2, 5), 
 world.loadGraph(roomGraph)
 
 # UNCOMMENT TO VIEW MAP
-world.printRooms()
+# world.printRooms()
 
 player = Player("Name", world.startingRoom)
 
-# Fill this out
-traversalPath = []
+traversalPath = [] 
+my_grapth = {}
+unexplored = []
 
+my_grapth[player.currentRoom.id] = player.currentRoom.getExits()
+
+def getOpposite(direction):
+    if direction is 'n':
+        return 's' 
+    elif direction is 's':
+        return 'n'
+    elif direction is 'e':
+        return 'w'
+    elif direction is 'w':
+        return 'e'
+
+while len(my_grapth) < len(roomGraph)-1:
+    if player.currentRoom.id not in my_grapth: 
+        # add room and it's exits   
+        my_grapth[player.currentRoom.id] = player.currentRoom.getExits()
+        last_direction = unexplored[-1]   
+        # remove last visited room from graph
+        my_grapth[player.currentRoom.id].remove(last_direction)                        
+
+    # while there are no more exits
+    while len(my_grapth[player.currentRoom.id]) == 0:  
+        # go back and find unexplored exits
+        prev_direction = unexplored.pop()  
+        traversalPath.append(prev_direction)                
+        player.travel(prev_direction)
+    
+    # first direction
+    first_dir = my_grapth[player.currentRoom.id].pop()
+    # add it to traversal path  
+    traversalPath.append(first_dir)  
+    # get and add oposite direction to unexplored exits list
+    opposite = getOpposite(first_dir)
+    unexplored.append(opposite)   
+    player.travel(first_dir)
 
 
 # TRAVERSAL TEST
